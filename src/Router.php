@@ -55,7 +55,7 @@ class Router
         }
     }
 
-    ppublic function run()
+    public function run()
     {
         $requestUrl = (string) urldecode(Request::url());
         $requestMethod = Request::method();
