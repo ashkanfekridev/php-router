@@ -55,12 +55,14 @@ class Router
         }
     }
 
-    public function run()
+    ppublic function run()
     {
-        $requestUrl = Request::url();
+        $requestUrl = (string) urldecode(Request::url());
         $requestMethod = Request::method();
+
+
         foreach ($this->routes as $route) {
-            $pattern = "@^" . preg_replace('/\\\:[a-zA-Z0-9\_\-]+/', '([a-zA-Z0-9\-\_]+)', preg_quote($route['url'])) . "$@D";
+            $pattern = "@^" . preg_replace('/\\\:[a-zA-Z0-9\_\-]+/', '([a-zA-Z0-9الف-ی\-\_]+)', preg_quote($route['url'])) . "$@D";
             $matches = [];
             if ($requestMethod == $route['method'] && preg_match($pattern, $requestUrl, $matches)) {
                 preg_match_all('/:[a-zA-Z0-9\_\-]+/', $route['url'], $mst);
