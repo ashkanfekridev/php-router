@@ -2,7 +2,9 @@
     "name": "ashkanfekri/router",
     "type": "library",
     "license": "MIT",
-    "require": {},
+    "require": {
+      "ashkanfekri/request": "^1.0"
+    },
     "autoload": {
         "classmap": [
             "src/"
