@@ -41,7 +41,7 @@ class Router
     private function notFoundPage()
     {
 //            action on notfound page
-        return print_r("صفحه مورد نظر شما صحیح نیست!");
+        return print_r("404");
     }
 
 //    show response from route action
@@ -57,7 +57,7 @@ class Router
 
     public function run()
     {
-        $requestUrl = (string) urldecode(Request::url());
+        $requestUrl = (string)urldecode(Request::url());
         $requestMethod = Request::method();
 
 
@@ -68,16 +68,25 @@ class Router
                 preg_match_all('/:[a-zA-Z0-9\_\-]+/', $route['url'], $mst);
                 // remove the first match
                 array_shift($matches);
+                // remove the first mst
+                $mst = $mst[0];
+//              remove : on route data key
+                $mst = array_map(function ($array) {
+                    return trim($array, ':');
+                }, $mst);
+
+                $route_data = array_combine($mst, $matches);
+
                 // call the callback with the matched positions as params
                 if (is_object($route['action'])) {
-                    $callAction = call_user_func_array($route['action'], $matches);
+                    $callAction = call_user_func_array($route['action'], $route_data);
                 } else {
                     $action = explode('@', $route['action']);
-                    $callAction = call_user_func([$this->controllerNameSpace . $action[0], $action[1]], $matches);
+                    $callAction = call_user_func_array([$this->controllerNameSpace . $action[0], $action[1]], $route_data);
                 }
                 return $this->response($callAction);
             }
         }
-        return $this->notFoundPage();
+       return $this->notFoundPage();
     }
 }
