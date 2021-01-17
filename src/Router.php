@@ -64,6 +64,7 @@ class Router
         foreach ($this->routes as $route) {
             $pattern = "@^" . preg_replace('/\\\:[a-zA-Z0-9\_\-]+/', '([a-zA-Z0-9الف-ی\-\_]+)', preg_quote($route['url'])) . "$@D";
             $matches = [];
+            $route_data = [];
             if ($requestMethod == $route['method'] && preg_match($pattern, $requestUrl, $matches)) {
                 preg_match_all('/:[a-zA-Z0-9\_\-]+/', $route['url'], $mst);
                 // remove the first match
@@ -79,14 +80,23 @@ class Router
 
                 // call the callback with the matched positions as params
                 if (is_object($route['action'])) {
-                    $callAction = call_user_func_array($route['action'], $route_data);
+                    return $this->response(call_user_func_array($route['action'], $route_data));
                 } else {
-                    $action = explode('@', $route['action']);
-                    $callAction = call_user_func_array([$this->controllerNameSpace . $action[0], $action[1]], $route_data);
+
+                    list($controller, $method) = explode('@', $route['action']);
+
+                    $controller = ($this->controllerNameSpace . $controller);
+
+                    if (class_exists($controller)) {
+                        $controller = new $controller;
+
+                        return $this->response(call_user_func([$controller,$method], $route_data));
+                    }else{
+                        throw new \Exception("کنترلر${$controller} موجود نمی باشد");
+                    }
                 }
-                return $this->response($callAction);
             }
         }
-       return $this->notFoundPage();
+        return $this->notFoundPage();
     }
 }
